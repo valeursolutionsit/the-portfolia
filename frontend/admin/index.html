@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="portfolia-api-base" content="" />
+    <title>Admin Console | The Portfolia</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+    <script defer src="../js/admin.js"></script>
+</head>
+<body class="portal-body admin-body">
+    <main id="admin-gate" class="admin-gate">
+        <a class="brand" href="../index.html">The Portfolia</a>
+        <div class="admin-gate-grid">
+            <section class="auth-card">
+                <p class="eyebrow">ADMIN ACCESS</p>
+                <h1>Platform administration</h1>
+                <p>Sign in with an existing admin account, or register an admin using the registration key configured by your operator.</p>
+                <a class="button-link" href="../login.html?next=admin">Sign in</a>
+            </section>
+            <section class="auth-card">
+                <p class="eyebrow">SEPARATE ADMIN REGISTRATION</p>
+                <h2>Register as admin</h2>
+                <form id="admin-register-form" class="compact-form">
+                    <label>Full name<input name="full_name" required minlength="2" maxlength="255" autocomplete="name" /></label>
+                    <label>Work email<input name="email" type="email" required autocomplete="email" /></label>
+                    <label>Password (12+ characters)<input name="password" type="password" required minlength="12" maxlength="128" autocomplete="new-password" /></label>
+                    <label>Admin registration key<input name="registration_key" type="password" required minlength="16" maxlength="256" autocomplete="off" /></label>
+                    <p class="form-help">Registration is disabled unless <code>ADMIN_REGISTRATION_KEY</code> is configured on the API server. Keep that key private.</p>
+                    <button type="submit">Register admin</button>
+                    <p class="form-note" data-message role="status"></p>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <div id="admin-console" class="portal-shell admin-shell" hidden>
+        <aside class="portal-sidebar">
+            <a class="brand" href="../index.html">The Portfolia</a>
+            <p class="sidebar-caption">ADMIN CONSOLE</p>
+            <nav class="portal-nav" aria-label="Administration">
+                <a class="is-active" href="#overview" data-admin-view="overview">Overview</a>
+                <a href="#skill-tests" data-admin-view="skill-tests">Skill tests</a>
+                <a href="#students" data-admin-view="students">Students</a>
+                <a href="#users" data-admin-view="users">Users</a>
+                <a href="#organizations" data-admin-view="organizations">Organizations</a>
+                <a href="#opportunities" data-admin-view="opportunities">Opportunities</a>
+                <a href="#support" data-admin-view="support">Support tickets</a>
+                <a href="#activity" data-admin-view="activity">Audit activity</a>
+            </nav>
+            <button type="button" class="button-link secondary logout-button" id="admin-logout">Log out</button>
+        </aside>
+
+        <div class="portal-content">
+            <header class="portal-topbar">
+                <button type="button" class="menu-toggle" id="admin-menu-toggle" aria-label="Toggle navigation">Menu</button>
+                <span>Platform administration · actions are recorded.</span>
+                <span id="admin-name" class="port-id-chip">Administrator</span>
+            </header>
+            <main class="portal-main">
+                <div id="admin-alert" role="status" aria-live="polite"></div>
+                <section id="admin-view-overview" class="admin-view is-active">
+                    <p class="eyebrow">PLATFORM HEALTH</p><h1>Overview</h1>
+                    <div class="dashboard-grid portal-metrics" id="admin-metrics"><article class="board-panel"><p>Loading platform records…</p></article></div>
+                    <div class="split-grid portal-columns">
+                        <article class="board-panel"><h2>Recent registrations</h2><div id="admin-recent-users"></div></article>
+                        <article class="board-panel"><h2>Recent admin activity</h2><div id="admin-recent-activity"></div></article>
+                    </div>
+                </section>
+
+                <section id="admin-view-skill-tests" class="admin-view">
+                    <p class="eyebrow">ASSESSMENT AUTHORING</p><h1>Skill tests</h1>
+                    <p class="section-intro">Create backend-scored tests with exactly 30 multiple-choice questions. Correct answers stay private and are never sent to students.</p>
+                    <form id="admin-assessment-form" class="portal-form compact-form">
+                        <input name="id" type="hidden" />
+                        <div class="form-grid">
+                            <label>Test title<input name="title" required minlength="2" maxlength="255" /></label>
+                            <label>Skill category<input name="category" required minlength="2" maxlength="80" /></label>
+                            <label>Duration (minutes)<input name="duration_minutes" type="number" min="1" max="300" value="30" required /></label>
+                            <label class="check-label"><input name="is_active" type="checkbox" checked /> Available to students</label>
+                            <label class="form-span">Description<textarea name="description" rows="2" maxlength="5000"></textarea></label>
+                        </div>
+                        <div class="panel-heading">
+                            <div><h2>30 multiple-choice questions</h2><p class="form-help">Each question needs a topic, four distinct options, and one correct answer.</p></div>
+                            <button type="submit" id="admin-assessment-submit">Create test</button>
+                        </div>
+                        <div id="admin-assessment-questions" class="admin-assessment-questions"></div>
+                        <p class="form-note" data-message role="status"></p>
+                        <button type="button" class="button-link secondary" id="admin-assessment-cancel" hidden>Cancel editing</button>
+                    </form>
+                    <article class="board-panel"><h2>Managed tests</h2><div id="admin-assessments"><p>Loading tests…</p></div></article>
+                </section>
+
+                <section id="admin-view-students" class="admin-view">
+                    <p class="eyebrow">STUDENT RECORDS</p><h1>Student management</h1>
+                    <p class="section-intro">Create, update, and remove student accounts, profiles, skills, learning records, portfolios, teams, and related student data.</p>
+                    <div class="admin-student-toolbar">
+                        <form id="admin-student-search" class="search-form">
+                            <input name="q" placeholder="Search name, email or Port ID" aria-label="Search students" />
+                            <button type="submit">Search students</button>
+                        </form>
+                        <button type="button" id="admin-student-create">Create student</button>
+                    </div>
+                    <div id="admin-students" class="board-panel"><p>Loading students…</p></div>
+                    <section id="admin-student-detail" class="admin-student-detail board-panel" hidden>
+                        <div class="panel-heading">
+                            <div><p class="eyebrow">STUDENT WORKSPACE</p><h2 id="admin-student-title">Student records</h2></div>
+                            <div class="admin-student-actions">
+                                <button type="button" class="small-button" id="admin-student-edit">Edit profile</button>
+                                <button type="button" class="small-button danger-button" id="admin-student-delete">Delete student</button>
+                            </div>
+                        </div>
+                        <p id="admin-student-summary" class="section-intro"></p>
+                        <div id="admin-student-profile" class="admin-profile-grid"></div>
+                        <div id="admin-student-records" class="admin-student-records"></div>
+                    </section>
+                </section>
+
+                <section id="admin-view-users" class="admin-view">
+                    <p class="eyebrow">ACCOUNT MANAGEMENT</p><h1>Users</h1>
+                    <form id="admin-user-search" class="search-form">
+                        <input name="q" placeholder="Search name, email or Port ID" />
+                        <select name="user_type"><option value="">All account types</option><option value="student">Student</option><option value="college_admin">College</option><option value="company">Company</option><option value="investor">Investor</option><option value="admin">Admin</option></select>
+                        <select name="is_active"><option value="">Any status</option><option value="true">Active</option><option value="false">Inactive</option></select>
+                        <button>Search users</button>
+                    </form>
+                    <div id="admin-users" class="board-panel"><p>Loading users…</p></div>
+                </section>
+
+                <section id="admin-view-organizations" class="admin-view">
+                    <p class="eyebrow">STAKEHOLDER ACCOUNTS</p><h1>Organizations</h1>
+                    <p class="section-intro">Review colleges, companies, and investors. Verification status controls only the account record.</p>
+                    <div id="admin-organizations" class="board-panel"><p>Loading organizations…</p></div>
+                </section>
+
+                <section id="admin-view-opportunities" class="admin-view">
+                    <p class="eyebrow">CONTENT MODERATION</p><h1>Opportunities</h1>
+                    <form id="admin-opportunity-search" class="search-form"><input name="q" placeholder="Search title or organization" /><button>Search</button></form>
+                    <div id="admin-opportunities"><p>Loading opportunities…</p></div>
+                </section>
+
+                <section id="admin-view-support" class="admin-view">
+                    <p class="eyebrow">STUDENT SUPPORT</p><h1>Support tickets</h1>
+                    <form id="admin-ticket-search" class="search-form">
+                        <input name="q" placeholder="Search subject or student email" />
+                        <select name="status"><option value="">All statuses</option><option>open</option><option>in_progress</option><option>closed</option></select>
+                        <button>Search tickets</button>
+                    </form>
+                    <div class="split-grid portal-columns">
+                        <div id="admin-tickets" class="board-panel"><p>Loading tickets…</p></div>
+                        <div id="admin-ticket-detail" class="board-panel"><p>Select a ticket to review it.</p></div>
+                    </div>
+                </section>
+
+                <section id="admin-view-activity" class="admin-view">
+                    <p class="eyebrow">ACCOUNTABILITY</p><h1>Audit activity</h1>
+                    <div id="admin-activity" class="board-panel"><p>Loading audit records…</p></div>
+                </section>
+                <footer class="portal-footer">The Portfolia · Admin console</footer>
+            </main>
+        </div>
+    </div>
+    <dialog id="admin-student-dialog" class="admin-dialog">
+        <form id="admin-student-form" class="compact-form">
+            <div class="panel-heading"><h2 id="admin-student-form-title">Create student</h2><button type="button" class="small-button secondary" data-dialog-close>Close</button></div>
+            <div id="admin-student-form-fields" class="admin-dialog-fields"></div>
+            <p class="form-note" data-message role="status"></p>
+            <button type="submit">Save student</button>
+        </form>
+    </dialog>
+    <dialog id="admin-record-dialog" class="admin-dialog">
+        <form id="admin-record-form" class="compact-form">
+            <div class="panel-heading"><h2 id="admin-record-form-title">Student record</h2><button type="button" class="small-button secondary" data-dialog-close>Close</button></div>
+            <div id="admin-record-form-fields" class="admin-dialog-fields"></div>
+            <p class="form-note" data-message role="status"></p>
+            <button type="submit">Save record</button>
+        </form>
+    </dialog>
+</body>
+</html>
